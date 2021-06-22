@@ -1,0 +1,199 @@
+<html>
+<head>
+
+	<title>Bloggers</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+
+    <style>
+    	@font-face {
+			font-family: "Comfortaa";
+			src: url("/static/Comfortaa/Comfortaa-VariableFont_wght.ttf") format("truetype");
+			font-style: normal;
+			font-weight: normal;
+		}
+
+		* {
+			font-family: "Comfortaa";
+			font-size: 20px;
+		}
+    </style>
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            let options = [
+            			{"value": 0, "title": "Все группы"}, 
+            			{"value": 121304138, "title": "ВПШ bohems"}, 
+            			{"value": 41768412, "title": "Kosti bloggers"}, 
+            			{"value": 43074088, "title": "YouTube | Ютуб"}, 
+            			{"value": 73247559, "title": "ВПШ"}, 
+            			{"value": 83853569, "title": "BLOGGERS NEWS"}, 
+            			{"value": 40034115, "title": "ЁЖ - О БЛОГЕРАХ И СЕЛЕБАХ"}, 
+                    	{"value": 185073409, "title": "ТИКТОК хаус"}, 
+                    	{"value": 88799721, "title": "ТИКТОПЕРС | Новости TikTok"}, 
+                    	{"value": 104433541, "title": "Паппараци не дремлют"}, 
+                    	{"value": 66687279, "title": "CLIQUE"}, 
+                    	{"value": 84930809, "title": "БЛОГЕРЫ"}, 
+                    	{"value": 97385648, "title": "ЯВСОТНЕ - журнал о блогерах"},
+                    	{"value": 104168133, "title": "на Youtube уже больше 17ти лет!"}, 
+                    	{"value": 167923566, "title": "Богемная тусовка"}, 
+                    	{"value": 81820554, "title": "VPSH"}, 
+                    	{"value": 101209760, "title": "ЮТУБЕР"}, 
+                    	{"value": 46576367, "title": "BOGEMA"}
+                    	]
+            options.forEach(function(i) {
+            	$('#select').append('<option value="' + i["value"] + '">' + i["title"] + '</option>');
+            })
+
+            var myChart = false;
+            var ctx = document.getElementById('myChart').getContext('2d');
+            $('#update').click(function(event) {
+            	console.log("start");
+            	alert("Сервер приступил к обновлению данных, это может занять несколько минут")
+            	$.ajax('/prepare_data', function(msg) {
+            		console.log("prepared");
+            	})
+            })
+            $('#start').click(function(event) {
+            	console.log("clicked");
+            
+            	if (myChart)
+            		myChart.destroy();
+            	
+            	let num = $("#select").val()
+	            $.ajax({
+	            	type: "GET",
+	            	url: '/get_data',
+	            	data: {"num": num}
+	            }).done(function(msg) {
+	            	console.log(msg);
+	            	// var ctx = document.getElementById('myChart').getContext('2d');
+					var labels = msg["data"].map(function(elem) {
+						return elem[1];
+					});
+					var data = {
+					  labels: labels,
+					  datasets: [
+					    {
+					      label: 'Наиболее часто встречаемые слова',
+					      data: msg["data"].map(function(elem) {
+					      	return elem[2];
+					      }),
+					      borderColor: "#FF0000",
+					      backgroundColor: "#FFFF00",
+					    }
+					  ]
+					};
+					var config = {
+					  type: 'bar',
+					  data: data,
+					  options: {
+					    indexAxis: 'y',
+					    elements: {
+					      bar: {
+					        borderWidth: 2,
+					      }
+					    },
+					    responsive: true,
+					    plugins: {
+					      legend: {
+					        position: 'right',
+					      },
+					      title: {
+					        display: true,
+					        text: 'График'
+					      }
+					    }
+					  },
+					};
+					myChart = new Chart(ctx, config);
+	            })
+            	// $("#status").show();
+                // socket.emit('start', {data: ""});
+                // return false;
+            });
+
+            // $('form#disconnect').submit(function(event) {
+            //     socket.emit('disconnect_request');
+            //     return false;
+            // });
+
+        });
+	</script>
+
+</head>
+
+<body>
+  <div class="container">
+  	<div class="d-flex justify-content-center">
+  		<img src="/static/bloggers.jpg" alt="" width="100%">
+  	</div>
+
+    <h1 align="center">Что пишут о блогерах?</h1>
+    <p align="center">Мы расскажем, какие термины наиболее популярны в новостях о блогерах</p>
+  </div>
+
+  <div class="container">
+    <h1 align="center">Цель проекта</h1>
+    <p>Блогеры - люди, за чьими жизнями в наше время следят очень многие. Именно по этой причине они часто бывают источником различных сплетен и интригующих новостей. Мы хотим узнать, какие термины чаще всего употребляются в СМИ, а именно в группах Вконтакте. </p>
+    <div class="d-flex justify-content-center">
+	    <div class="">
+		    <img src="/static/insta.png" alt="" width="320">
+		    <img src="/static/youtube.png" alt="" width="320">
+		    <img src="/static/tiktok.png" alt="" width="320">
+	    </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2 align="center">Какие группы попали в выборку</h2>
+    <div class="row">
+      	<div class="col-md-3">
+	        <ul>
+		        <li>ВПШ</li>
+		        <li>Kosti bloggers</li>
+		        <li>YouTube</li>
+		        <li>Bloggers news</li>
+		        <li>ЁЖ</li>
+		        <li>Паппарации не дремлют</li>
+		        <li>БОГЕМА</li>
+		        <li>Ютубер</li>
+		        <li>ЯВСОТНЕ</li>
+		        <li>CLIQUE и другие</li>
+	      	</ul>
+   		</div>
+		<div class="col-md-9">
+			<img src="/static/1.jpg" alt="Фотография 1" width="150" height="150">
+			<img src="/static/2.jpg" alt="Фотография 2" width="150" height="150">
+			<img src="/static/3.jpg" alt="Фотография 3" width="150" height="150">
+			<img src="/static/4.jpg" alt="Фотография 4" width="150" height="150">
+			<img src="/static/5.jpg" alt="Фотография 5" width="150" height="150">
+		</div>
+	</div>
+
+    <div class="container">
+      	<h2 align="center">Результаты исследования</h2>
+      	<div class="d-flex justify-content-center">
+      		<div>
+	        	<div>
+	        		<span>Выберите номер группы</span>
+	        		<select id="select" class="form-select"></select>
+	        	</div>
+	        	<div class="d-flex justify-content-center mt-3">
+	        		<input type="button" id="start" value="Начать" class="btn btn-primary">
+	        	</div>
+        	</div>
+        </div>
+    	<div>
+		  	<canvas id="myChart"></canvas>
+		</div>
+  	</div>
+</body>
+</html>

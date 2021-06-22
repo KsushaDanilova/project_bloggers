@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "Comfortaa";
+  src: url("Comfortaa/Comfortaa-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: normal;
+}
+
+* {
+	font-family: "Comfortaa";
+	font-size: 40px;
+}
